@@ -1,1 +1,3 @@
 # derive
+
+Derive is a project written in Go that allows users to utilize macro functionality similar to that of Rust. With Derive, developers can simplify their codebase by defining and invoking macros to generate repetitive or boilerplate code. Derive aims to improve the developer experience by reducing code redundancy and increasing code readability. It provides an intuitive interface for defining and invoking macros, making it an excellent tool for developers looking to improve their productivity in Go programming.
