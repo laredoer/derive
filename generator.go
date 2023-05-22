@@ -33,11 +33,19 @@ type File struct {
 	Pkg      *Package // Package to which this file belongs.
 	FileName string
 	AstFile  *ast.File // Parsed AST.
-	Derives  map[string][]Derive
+	Types    map[string]Type
 }
 
-func (f *File) AddDerive(typeName string, derives []Derive) {
-	f.Derives[typeName] = append(f.Derives[typeName], derives...)
+type Type struct {
+	Type    string
+	Derives []Derive
+}
+
+func (f *File) AddDerive(tName, tType string, derives []Derive) {
+	f.Types[tName] = Type{
+		Type:    tType,
+		Derives: derives,
+	}
 }
 
 func (f *File) GenDecl(node ast.Node) bool {
@@ -65,6 +73,7 @@ func (f *File) GenDecl(node ast.Node) bool {
 		}
 
 		var typ string
+		var tType string
 		if spec := gDecl.Specs[0]; spec != nil {
 			typeSpec, ok := spec.(*ast.TypeSpec)
 			if !ok {
@@ -72,9 +81,10 @@ func (f *File) GenDecl(node ast.Node) bool {
 			}
 
 			typ = typeSpec.Name.Name
+			tType = typeSpec.Type.(*ast.Ident).Name
 		}
 
-		f.AddDerive(typ, ParseCommentToDerive(comments))
+		f.AddDerive(typ, tType, ParseCommentToDerive(comments))
 	}
 
 	return false
@@ -105,7 +115,7 @@ func (g *Generator) AddPackage(pkg *packages.Package) {
 			Pkg:      g.Pkg,
 			FileName: pkg.Fset.File(file.Pos()).Name(),
 			AstFile:  file,
-			Derives:  make(map[string][]Derive),
+			Types:    make(map[string]Type),
 		}
 	}
 }
@@ -119,8 +129,8 @@ func (g *Generator) Generate(file *File) {
 	// import
 	buffer.Write([]byte("\n\n"))
 	buffer.WriteString("import (\n \"github.com/wule61/derive/utils\" \n \"fmt\" \n)")
-	for typ, derives := range file.Derives {
-		for _, derive := range derives {
+	for typ, derives := range file.Types {
+		for _, derive := range derives.Derives {
 			if derive.Name == "i18n" {
 				data := i18n.TransFnTplData{
 					Type: typ,
@@ -129,7 +139,7 @@ func (g *Generator) Generate(file *File) {
 				for _, v := range derive.Params {
 					if v.Name == "code" {
 						data.Code = i18n.Code{
-							Type:  v.Type,
+							Type:  derives.Type,
 							Value: v.Value,
 						}
 						continue

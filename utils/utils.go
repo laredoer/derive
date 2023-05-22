@@ -12,5 +12,5 @@ func ParseLangArgs(langOrArgs ...any) (lang string, args []any) {
 	}
 
 	//否则，返回默认值
-	return "zh-HK", nil
+	return "zh-HK", []any{}
 }

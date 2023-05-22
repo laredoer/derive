@@ -19,19 +19,25 @@ type TransFnTplData struct {
 	DefaultLang Lang
 }
 
-const TransFnTpl = `func ({{.Type}}) Trans(langOrArgs ...any) string {
+const TransFnTpl = `var {{.Type}}Locales = map[string]string{
+	{{- range $index, $element := .Langs}}
+	"{{$element.Lang}}": "{{$element.Value}}",
+	{{- end}}
+}
 
-	// 解析语言和参数
+func ({{.Type}}) Trans(langOrArgs ...any) string {
+
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	// 返回翻译结果
-	switch lang {
-	{{range $index, $element := .Langs}}
-	case "{{$element.Lang}}":
-		return fmt.Sprintf("{{$element.Value}}", args...)
-	{{end}}
-	default:
-		return fmt.Sprintf("{{.DefaultLang.Value}}", args...)
+  msg := {{.Type}}Locales[lang]
+	if _, ok := {{.Type}}Locales[lang]; !ok {
+		msg = {{.Type}}Locales["{{.DefaultLang.Lang}}"]
 	}
+
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args...)
+	}
+
+	return msg
 }
 
 func ({{.Type}}) Code() {{.Code.Type}} {

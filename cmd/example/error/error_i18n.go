@@ -9,55 +9,55 @@ import (
 
 var cardIDNotSpecified_ cardIDNotSpecified = 400
 
-func (cardIDNotSpecified) Trans(langOrArgs ...any) string {
-
-	// 解析语言和参数
-	lang, args := utils.ParseLangArgs(langOrArgs...)
-	// 返回翻译结果
-	switch lang {
-	
-	case "zh-HK":
-		return fmt.Sprintf("卡券 id 未选择", args...)
-	
-	case "zh-CN":
-		return fmt.Sprintf("卡券 id 未选择", args...)
-	
-	case "en":
-		return fmt.Sprintf("卡券 id 未选择", args...)
-	
-	default:
-		return fmt.Sprintf("卡券 id 未选择", args...)
-	}
+var cardIDNotSpecifiedLocales = map[string]string{
+	"zh-HK": "卡券 id 未选择",
+	"zh-CN": "卡券 id 未选择",
+	"en": "卡券 id 未选择",
 }
 
-func (cardIDNotSpecified) Code() int {
+func (cardIDNotSpecified) Trans(langOrArgs ...any) string {
+
+	lang, args := utils.ParseLangArgs(langOrArgs...)
+  msg := cardIDNotSpecifiedLocales[lang]
+	if _, ok := cardIDNotSpecifiedLocales[lang]; !ok {
+		msg = cardIDNotSpecifiedLocales["zh-HK"]
+	}
+
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args...)
+	}
+
+	return msg
+}
+
+func (cardIDNotSpecified) Code() int32 {
 	return 400
 } 
 
 
 var TeamNotFound_ TeamNotFound = 400
 
-func (TeamNotFound) Trans(langOrArgs ...any) string {
-
-	// 解析语言和参数
-	lang, args := utils.ParseLangArgs(langOrArgs...)
-	// 返回翻译结果
-	switch lang {
-	
-	case "zh-HK":
-		return fmt.Sprintf("团队未找到", args...)
-	
-	case "zh-CN":
-		return fmt.Sprintf("团队未找到", args...)
-	
-	case "en":
-		return fmt.Sprintf("团队未找到", args...)
-	
-	default:
-		return fmt.Sprintf("团队未找到", args...)
-	}
+var TeamNotFoundLocales = map[string]string{
+	"zh-HK": "团队未找到",
+	"zh-CN": "团队未找到",
+	"en": "团队未找到",
 }
 
-func (TeamNotFound) Code() int {
+func (TeamNotFound) Trans(langOrArgs ...any) string {
+
+	lang, args := utils.ParseLangArgs(langOrArgs...)
+  msg := TeamNotFoundLocales[lang]
+	if _, ok := TeamNotFoundLocales[lang]; !ok {
+		msg = TeamNotFoundLocales["zh-HK"]
+	}
+
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args...)
+	}
+
+	return msg
+}
+
+func (TeamNotFound) Code() int32 {
 	return 400
 } 
