@@ -9,7 +9,7 @@ import (
 
 var TeamNotFound_ TeamNotFound = 400
 
-var TeamNotFoundLocales = map[string]string{
+var teamnotfoundLocales = map[string]string{
 	"zh-HK": "团队未找到",
 	"zh-CN": "团队未找到",
 	"en": "团队未找到",
@@ -18,9 +18,9 @@ var TeamNotFoundLocales = map[string]string{
 func (TeamNotFound) Trans(langOrArgs ...any) string {
 
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-  msg := TeamNotFoundLocales[lang]
-	if _, ok := TeamNotFoundLocales[lang]; !ok {
-		msg = TeamNotFoundLocales["zh-HK"]
+  msg := teamnotfoundLocales[lang]
+	if _, ok := teamnotfoundLocales[lang]; !ok {
+		msg = teamnotfoundLocales["zh-HK"]
 	}
 
 	if len(args) > 0 {
@@ -35,20 +35,20 @@ func (TeamNotFound) Code() int32 {
 } 
 
 
-var cardIDNotSpecified_ cardIDNotSpecified = 400
+var CardIDNotSpecified_ CardIDNotSpecified = 400
 
-var cardIDNotSpecifiedLocales = map[string]string{
+var cardidnotspecifiedLocales = map[string]string{
 	"zh-HK": "卡券 id 未选择",
 	"zh-CN": "卡券 id 未选择",
 	"en": "卡券 id 未选择",
 }
 
-func (cardIDNotSpecified) Trans(langOrArgs ...any) string {
+func (CardIDNotSpecified) Trans(langOrArgs ...any) string {
 
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-  msg := cardIDNotSpecifiedLocales[lang]
-	if _, ok := cardIDNotSpecifiedLocales[lang]; !ok {
-		msg = cardIDNotSpecifiedLocales["zh-HK"]
+  msg := cardidnotspecifiedLocales[lang]
+	if _, ok := cardidnotspecifiedLocales[lang]; !ok {
+		msg = cardidnotspecifiedLocales["zh-HK"]
 	}
 
 	if len(args) > 0 {
@@ -58,6 +58,6 @@ func (cardIDNotSpecified) Trans(langOrArgs ...any) string {
 	return msg
 }
 
-func (cardIDNotSpecified) Code() int32 {
+func (CardIDNotSpecified) Code() int32 {
 	return 400
 } 

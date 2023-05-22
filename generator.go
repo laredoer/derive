@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/wule61/derive/i18n"
 
 	"golang.org/x/tools/go/packages"
@@ -167,7 +168,7 @@ func (g *Generator) Generate(file *File) {
 				buffer.WriteString(fmt.Sprintf("var %v_ %v = %d", Type.TypeName, Type.TypeName, data.Code.Value))
 				buffer.Write([]byte("\n\n"))
 
-				tmpl, err := template.New("i18n_trans_fn").Parse(i18n.TransFnTpl)
+				tmpl, err := template.New("i18n_trans_fn").Funcs(sprig.FuncMap()).Parse(i18n.TransFnTpl)
 				if err != nil {
 					panic(err)
 				}

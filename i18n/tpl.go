@@ -19,7 +19,7 @@ type TransFnTplData struct {
 	DefaultLang Lang
 }
 
-const TransFnTpl = `var {{.Type}}Locales = map[string]string{
+const TransFnTpl = `var {{lower .Type}}Locales = map[string]string{
 	{{- range $index, $element := .Langs}}
 	"{{$element.Lang}}": "{{$element.Value}}",
 	{{- end}}
@@ -28,9 +28,9 @@ const TransFnTpl = `var {{.Type}}Locales = map[string]string{
 func ({{.Type}}) Trans(langOrArgs ...any) string {
 
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-  msg := {{.Type}}Locales[lang]
-	if _, ok := {{.Type}}Locales[lang]; !ok {
-		msg = {{.Type}}Locales["{{.DefaultLang.Lang}}"]
+  msg := {{lower .Type}}Locales[lang]
+	if _, ok := {{lower .Type}}Locales[lang]; !ok {
+		msg = {{lower .Type}}Locales["{{.DefaultLang.Lang}}"]
 	}
 
 	if len(args) > 0 {
