@@ -7,6 +7,7 @@ import (
  "fmt" 
 )
 
+// TeamNotFound_ 团队未找到 [400]
 var TeamNotFound_ TeamNotFound = 400
 
 var teamnotfoundLocales = map[string]string{
@@ -35,6 +36,7 @@ func (TeamNotFound) Code() int32 {
 } 
 
 
+// CardIDNotSpecified_ 卡券 id 未选择 [400]
 var CardIDNotSpecified_ CardIDNotSpecified = 400
 
 var cardidnotspecifiedLocales = map[string]string{
