@@ -33,19 +33,21 @@ type File struct {
 	Pkg      *Package // Package to which this file belongs.
 	FileName string
 	AstFile  *ast.File // Parsed AST.
-	Types    map[string]Type
+	Types    []Type
 }
 
 type Type struct {
-	Type    string
-	Derives []Derive
+	TypeName string
+	TypeType string
+	Derives  []Derive
 }
 
 func (f *File) AddDerive(tName, tType string, derives []Derive) {
-	f.Types[tName] = Type{
-		Type:    tType,
-		Derives: derives,
-	}
+	f.Types = append(f.Types, Type{
+		TypeName: tName,
+		TypeType: tType,
+		Derives:  derives,
+	})
 }
 
 func (f *File) GenDecl(node ast.Node) bool {
@@ -81,7 +83,11 @@ func (f *File) GenDecl(node ast.Node) bool {
 			}
 
 			typ = typeSpec.Name.Name
-			tType = typeSpec.Type.(*ast.Ident).Name
+			tIdent, ok := typeSpec.Type.(*ast.Ident)
+			if !ok {
+				continue
+			}
+			tType = tIdent.Name
 		}
 
 		f.AddDerive(typ, tType, ParseCommentToDerive(comments))
@@ -115,7 +121,6 @@ func (g *Generator) AddPackage(pkg *packages.Package) {
 			Pkg:      g.Pkg,
 			FileName: pkg.Fset.File(file.Pos()).Name(),
 			AstFile:  file,
-			Types:    make(map[string]Type),
 		}
 	}
 }
@@ -129,17 +134,18 @@ func (g *Generator) Generate(file *File) {
 	// import
 	buffer.Write([]byte("\n\n"))
 	buffer.WriteString("import (\n \"github.com/wule61/derive/utils\" \n \"fmt\" \n)")
-	for typ, derives := range file.Types {
-		for _, derive := range derives.Derives {
+
+	for _, Type := range file.Types {
+		for _, derive := range Type.Derives {
 			if derive.Name == "i18n" {
 				data := i18n.TransFnTplData{
-					Type: typ,
+					Type: Type.TypeName,
 					Code: i18n.Code{},
 				}
 				for _, v := range derive.Params {
 					if v.Name == "code" {
 						data.Code = i18n.Code{
-							Type:  derives.Type,
+							Type:  Type.TypeType,
 							Value: v.Value,
 						}
 						continue
@@ -158,7 +164,7 @@ func (g *Generator) Generate(file *File) {
 				}
 
 				buffer.Write([]byte("\n\n"))
-				buffer.WriteString(fmt.Sprintf("var %v_ %v = %d", typ, typ, data.Code.Value))
+				buffer.WriteString(fmt.Sprintf("var %v_ %v = %d", Type.TypeName, Type.TypeName, data.Code.Value))
 				buffer.Write([]byte("\n\n"))
 
 				tmpl, err := template.New("i18n_trans_fn").Parse(i18n.TransFnTpl)
@@ -197,13 +203,10 @@ func WriteToFile(fileName string, content []byte) error {
 	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
-	} else {
-		// offset
-		//os.Truncate(filename, 0) //clear
-		n, _ := f.Seek(0, io.SeekEnd)
-		_, err = f.WriteAt(content, n)
-		fmt.Println("write succeed!")
-		defer f.Close()
 	}
+	defer f.Close()
+
+	n, _ := f.Seek(0, io.SeekEnd)
+	_, err = f.WriteAt(content, n)
 	return err
 }
