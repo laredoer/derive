@@ -4,11 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
-	"go/token"
 	"os"
-	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/wule61/derive"
 	"golang.org/x/tools/go/packages"
 )
@@ -39,67 +36,10 @@ func main() {
 	for _, pkg := range pkgs {
 		g := &derive.Generator{}
 		g.AddPackage(pkg)
-
-		println("---------------------------")
-		spew.Dump(g)
+		for _, file := range g.Pkg.File {
+			ast.Inspect(file.AstFile, file.GenDecl)
+			// 生成代码
+			g.Generate(file)
+		}
 	}
-
-	// ast.Inspect(pkg.Syntax[0], genDecl)
-}
-
-func genDecl(node ast.Node) bool {
-
-	decl, ok := node.(*ast.GenDecl)
-	if !ok || decl.Tok != token.CONST {
-		// We only care about const declarations.
-		return true
-	}
-
-	var typ string
-	for _, spec := range decl.Specs {
-		vSpec := spec.(*ast.ValueSpec)
-		if vSpec.Type == nil && len(vSpec.Values) > 0 {
-			typ = ""
-			bl, ok := vSpec.Values[0].(*ast.BasicLit)
-			if !ok {
-				continue
-			}
-			typ = strings.ToLower(bl.Kind.String())
-			if typ == "float" {
-				typ = "float64"
-			}
-		}
-
-		if vSpec.Type != nil {
-			ident, ok := vSpec.Type.(*ast.Ident)
-			if !ok {
-				continue
-			}
-			typ = ident.Name
-		}
-
-		println("----------------------------")
-		if vSpec.Doc == nil || len(vSpec.Doc.List) == 0 {
-			continue
-		}
-
-		var comments string
-		for _, comment := range vSpec.Doc.List {
-			comments += comment.Text
-		}
-
-		spew.Dump(derive.ParseCommentToDerive(comments))
-
-		for _, name := range vSpec.Names {
-			if name.Name == "_" {
-				continue
-			}
-
-		}
-
-		println("----------------------------")
-
-	}
-
-	return false
 }
