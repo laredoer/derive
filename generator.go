@@ -165,6 +165,8 @@ func (g *Generator) Generate(file *File) {
 				}
 
 				buffer.Write([]byte("\n\n"))
+				buffer.WriteString(fmt.Sprintf("// %v_ %v [%v]", Type.TypeName, data.DefaultLang.Value, data.Code.Value))
+				buffer.Write([]byte("\n"))
 				buffer.WriteString(fmt.Sprintf("var %v_ %v = %d", Type.TypeName, Type.TypeName, data.Code.Value))
 				buffer.Write([]byte("\n\n"))
 
