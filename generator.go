@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/types"
 	"html/template"
 	"io"
@@ -15,20 +16,6 @@ import (
 
 	"golang.org/x/tools/go/packages"
 )
-
-type Value struct {
-	OriginalName string // The name of the constant.
-	Name         string // The name with trimmed prefix.
-	// The value is stored as a bit pattern alone. The boolean tells us
-	// whether to interpret it as an int64 or an uint64; the only place
-	// this matters is when sorting.
-	// Much of the time the str field is all we need; it is printed
-	// by Value.String.
-	Value     uint64 // Will be converted to int64 when needed.
-	Signed    bool   // Whether the constant is a signed type.
-	Str       string // The string representation given by the "go/constant" package.
-	BasicType string // value of basic Type, for: int int64 uint etc
-}
 
 type File struct {
 	Pkg      *Package // Package to which this file belongs.
@@ -55,7 +42,6 @@ func (f *File) GenDecl(node ast.Node) bool {
 
 	fileNode, ok := node.(*ast.File)
 	if !ok {
-		// We only care about const declarations.
 		return true
 	}
 
@@ -180,7 +166,12 @@ func (g *Generator) Generate(file *File) {
 					panic(err)
 				}
 
-				err = WriteToFile(g.GetFileName(file.FileName, derive.Name), buffer.Bytes())
+				src, err := format.Source(buffer.Bytes())
+				if err != nil {
+					panic(err)
+				}
+
+				err = WriteToFile(g.GetFileName(file.FileName, derive.Name), src)
 				if err != nil {
 					panic(err)
 				}
@@ -191,9 +182,7 @@ func (g *Generator) Generate(file *File) {
 
 // GetFileName  获取要生成的文件名称
 func (g *Generator) GetFileName(fileName, deriveName string) string {
-
 	arr := strings.Split(fileName, ".")
-	// 以最后一个点号为分割
 	if len(arr) > 1 {
 		fileName = strings.Join(arr[:len(arr)-1], ".")
 	}
