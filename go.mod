@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/dave/jennifer v1.6.1
 	github.com/spf13/cast v1.5.0
 	golang.org/x/tools v0.8.0
 )

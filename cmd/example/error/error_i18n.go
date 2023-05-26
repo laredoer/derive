@@ -4,61 +4,49 @@ package err
 
 import (
 	"fmt"
-	"github.com/wule61/derive/utils"
+	utils "github.com/wule61/derive/utils"
 )
 
 // TeamNotFound_ 团队未找到 [400]
 var TeamNotFound_ TeamNotFound = 400
-
 var teamnotfoundLocales = map[string]string{
-	"zh-HK": "团队未找到",
-	"zh-CN": "团队未找到",
 	"en":    "团队未找到",
+	"zh-CN": "团队未找到",
+	"zh-HK": "团队未找到",
 }
 
 func (TeamNotFound) Trans(langOrArgs ...any) string {
-
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	msg := teamnotfoundLocales[lang]
-	if _, ok := teamnotfoundLocales[lang]; !ok {
-		msg = teamnotfoundLocales["zh-HK"]
+	if msg, ok := teamnotfoundLocales[lang]; ok {
+		if len(args) > 0 {
+			return fmt.Sprintf(msg, args...)
+		}
+		return msg
 	}
-
-	if len(args) > 0 {
-		msg = fmt.Sprintf(msg, args...)
-	}
-
-	return msg
+	return teamnotfoundLocales["zh-HK"]
 }
-
 func (TeamNotFound) Code() int32 {
 	return 400
 }
 
 // CardIDNotSpecified_ 卡券 id 未选择 [400]
 var CardIDNotSpecified_ CardIDNotSpecified = 400
-
 var cardidnotspecifiedLocales = map[string]string{
-	"zh-HK": "卡券 id 未选择",
-	"zh-CN": "卡券 id 未选择",
 	"en":    "卡券 id 未选择",
+	"zh-CN": "卡券 id 未选择",
+	"zh-HK": "卡券 id 未选择",
 }
 
 func (CardIDNotSpecified) Trans(langOrArgs ...any) string {
-
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	msg := cardidnotspecifiedLocales[lang]
-	if _, ok := cardidnotspecifiedLocales[lang]; !ok {
-		msg = cardidnotspecifiedLocales["zh-HK"]
+	if msg, ok := cardidnotspecifiedLocales[lang]; ok {
+		if len(args) > 0 {
+			return fmt.Sprintf(msg, args...)
+		}
+		return msg
 	}
-
-	if len(args) > 0 {
-		msg = fmt.Sprintf(msg, args...)
-	}
-
-	return msg
+	return cardidnotspecifiedLocales["zh-HK"]
 }
-
 func (CardIDNotSpecified) Code() int32 {
 	return 400
 }
