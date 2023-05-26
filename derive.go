@@ -6,24 +6,24 @@ import (
 	"github.com/wule61/derive/interpreter/parser"
 )
 
-type Derive struct {
-	Name   string
-	Params []DeriveParam
+type DeriveType struct {
+	Name string
+	Args []Field
 }
 
-type DeriveParam struct {
+type Field struct {
 	Name  string
-	Value any
 	Type  string
+	Value any
 }
 
-func ParseCommentToDerive(comment string) []Derive {
+func ParseCommentToDerive(comment string) []DeriveType {
 
 	l := lexer.New(comment)
 	p := parser.New(l)
 	program := p.ParseProgram()
 
-	var derives []Derive
+	var derives []DeriveType
 	for _, stmt := range program.Statements {
 		shap, ok := stmt.(*ast.ShapStatement)
 		if !ok {
@@ -33,12 +33,12 @@ func ParseCommentToDerive(comment string) []Derive {
 		for _, call := range shap.Elements {
 			switch call.(type) {
 			case *ast.CallExpression:
-				derive := Derive{
+				derive := DeriveType{
 					Name: call.(*ast.CallExpression).Function.(*ast.Identifier).Value,
 				}
 				arguments := call.(*ast.CallExpression).Arguments
 				for _, arg := range arguments {
-					deriveParam := DeriveParam{
+					deriveParam := Field{
 						Name: arg.(*ast.AssignLiteral).Name.(*ast.Identifier).Value,
 					}
 					switch arg.(*ast.AssignLiteral).Expression.(type) {
@@ -49,14 +49,14 @@ func ParseCommentToDerive(comment string) []Derive {
 						deriveParam.Value = arg.(*ast.AssignLiteral).Expression.(*ast.IntegerLiteral).Value
 						deriveParam.Type = "int"
 					}
-					derive.Params = append(derive.Params, deriveParam)
+					derive.Args = append(derive.Args, deriveParam)
 				}
 
 				derives = append(derives, derive)
 			case *ast.Identifier:
-				derives = append(derives, Derive{
-					Name:   call.(*ast.Identifier).Value,
-					Params: []DeriveParam{},
+				derives = append(derives, DeriveType{
+					Name: call.(*ast.Identifier).Value,
+					Args: []Field{},
 				})
 			}
 		}

@@ -17,17 +17,17 @@ type File struct {
 	Pkg      *Package // Package to which this file belongs.
 	FileName string
 	AstFile  *ast.File // Parsed AST.
-	Types    []Type
+	Types    []DerivedMethodsForType
 }
 
-type Type struct {
+type DerivedMethodsForType struct {
 	TypeName string
 	TypeType string
-	Derives  []Derive
+	Derives  []DeriveType
 }
 
-func (f *File) AddDerive(tName, tType string, derives []Derive) {
-	f.Types = append(f.Types, Type{
+func (f *File) AddDerive(tName, tType string, derives []DeriveType) {
+	f.Types = append(f.Types, DerivedMethodsForType{
 		TypeName: tName,
 		TypeType: tType,
 		Derives:  derives,
@@ -57,23 +57,23 @@ func (f *File) GenDecl(node ast.Node) bool {
 			}
 		}
 
-		var typ string
-		var tType string
+		var typeName string
+		var basicType string
 		if spec := gDecl.Specs[0]; spec != nil {
 			typeSpec, ok := spec.(*ast.TypeSpec)
 			if !ok {
 				continue
 			}
 
-			typ = typeSpec.Name.Name
+			typeName = typeSpec.Name.Name
 			tIdent, ok := typeSpec.Type.(*ast.Ident)
 			if !ok {
 				continue
 			}
-			tType = tIdent.Name
+			basicType = tIdent.Name
 		}
 
-		f.AddDerive(typ, tType, ParseCommentToDerive(comments))
+		f.AddDerive(typeName, basicType, ParseCommentToDerive(comments))
 	}
 
 	return false
@@ -120,7 +120,7 @@ func (g *Generator) Generate(file *File) {
 					Type: Type.TypeName,
 					Code: i18n.ErrorCode{},
 				}
-				for _, v := range derive.Params {
+				for _, v := range derive.Args {
 					if v.Name == "code" {
 						data.Code = i18n.ErrorCode{
 							Type:  Type.TypeType,
