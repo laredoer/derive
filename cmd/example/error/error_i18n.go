@@ -7,46 +7,46 @@ import (
 	utils "github.com/wule61/derive/utils"
 )
 
-// TeamNotFound_ 团队未找到 [400]
-var TeamNotFound_ TeamNotFound = 400
-var teamnotfoundLocales = map[string]string{
-	"en":    "团队未找到",
-	"zh-CN": "团队未找到",
-	"zh-HK": "团队未找到",
+// SystemIsProcessing_ 系統正在處理中，請稍後再試 [2501506]
+var SystemIsProcessing_ SystemIsProcessing = 2501506
+var systemisprocessingLocales = map[string]string{
+	"en":    "System is processing, please try again later",
+	"zh-CN": "系统正在处理中，请稍后再试",
+	"zh-HK": "系統正在處理中，請稍後再試",
 }
 
-func (TeamNotFound) Trans(langOrArgs ...any) string {
+func (SystemIsProcessing) Trans(langOrArgs ...any) string {
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	if msg, ok := teamnotfoundLocales[lang]; ok {
+	if msg, ok := systemisprocessingLocales[lang]; ok {
 		if len(args) > 0 {
 			return fmt.Sprintf(msg, args...)
 		}
 		return msg
 	}
-	return teamnotfoundLocales["zh-HK"]
+	return systemisprocessingLocales["zh-HK"]
 }
-func (TeamNotFound) Code() int32 {
-	return 400
-}
-
-// CardIDNotSpecified_ 卡券 id 未选择 [400]
-var CardIDNotSpecified_ CardIDNotSpecified = 400
-var cardidnotspecifiedLocales = map[string]string{
-	"en":    "卡券 id 未选择",
-	"zh-CN": "卡券 id 未选择",
-	"zh-HK": "卡券 id 未选择",
+func (SystemIsProcessing) Code() int32 {
+	return 2501506
 }
 
-func (CardIDNotSpecified) Trans(langOrArgs ...any) string {
+// RewardIsInProgress_ Reward is in progress [400]
+var RewardIsInProgress_ RewardIsInProgress = 400
+var rewardisinprogressLocales = map[string]string{
+	"en":    "Reward is in progress",
+	"zh-CN": "奖励正在发放中，无需再次领取",
+	"zh-HK": "獎勵正在發放中，無需再次領取",
+}
+
+func (RewardIsInProgress) Trans(langOrArgs ...any) string {
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	if msg, ok := cardidnotspecifiedLocales[lang]; ok {
+	if msg, ok := rewardisinprogressLocales[lang]; ok {
 		if len(args) > 0 {
 			return fmt.Sprintf(msg, args...)
 		}
 		return msg
 	}
-	return cardidnotspecifiedLocales["zh-HK"]
+	return rewardisinprogressLocales["en"]
 }
-func (CardIDNotSpecified) Code() int32 {
+func (RewardIsInProgress) Code() int32 {
 	return 400
 }

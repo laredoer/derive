@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/dave/jennifer/jen"
+	"github.com/samber/lo"
 	"github.com/wule61/derive/i18n"
 	"golang.org/x/tools/go/packages"
 )
@@ -120,25 +121,39 @@ func (g *Generator) Generate(file *File) {
 					Type: Type.TypeName,
 					Code: i18n.ErrorCode{},
 				}
+
+				fields := lo.KeyBy(derive.Args, func(field Field) string {
+					return field.Name
+				})
+
+				if code, ok := fields["code"]; ok {
+					data.Code = i18n.ErrorCode{
+						Type:  Type.TypeType,
+						Value: code.Value,
+					}
+				}
+
 				for _, v := range derive.Args {
-					if v.Name == "code" {
-						data.Code = i18n.ErrorCode{
-							Type:  Type.TypeType,
-							Value: v.Value,
-						}
+					if v.Name == "code" || v.Name == "default" {
 						continue
 					}
-					if v.Name == "zh-HK" {
-						data.DefaultLang = i18n.Lang{
-							Lang:  v.Name,
-							Value: v.Value,
-						}
-					}
-
 					data.Langs = append(data.Langs, i18n.Lang{
 						Lang:  v.Name,
 						Value: v.Value,
 					})
+				}
+
+				if len(data.Langs) == 0 {
+					continue
+				}
+
+				if defaultLang, ok := fields["default"]; ok {
+					data.DefaultLang = i18n.Lang{
+						Lang:  defaultLang.Value.(string),
+						Value: fields[defaultLang.Value.(string)].Value,
+					}
+				} else {
+					data.DefaultLang = data.Langs[0]
 				}
 
 				i18n.GenerateCode(data, f)
