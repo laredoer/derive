@@ -9,8 +9,10 @@ Derive is a project written in Go that allows users to utilize macro functionali
 // .../message/message.go
 package message
 
-// #[i18n(code = 400, zh-HK = "年卡", zh-CN = "年卡", en = "Year card")]
-type YearCard int32
+// 库存不足
+//
+// #[i18n(code = 400, zh-HK = "庫存不足", zh-CN = "库存不足", en = "Insufficient inventory")]
+type InsufficientInventory int32
 ```
 
 ```go
@@ -24,25 +26,27 @@ import (
 	"github.com/wule61/derive/utils"
 )
 
-var YearCard_ YearCard = 400
-var yearcardLocales = map[string]string{
-	"en":    "Year card",
-	"zh-CN": "年卡",
-	"zh-HK": "年卡",
+// InsufficientInventory_ 庫存不足 [400]
+var InsufficientInventory_ InsufficientInventory = 400
+
+var insufficientinventoryLocales = map[string]string{
+	"en":    "Insufficient inventory",
+	"zh-CN": "库存不足",
+	"zh-HK": "庫存不足",
 }
 
-func (YearCard) Trans(langOrArgs ...any) string {
+func (InsufficientInventory) Trans(langOrArgs ...any) string {
 	lang, args := utils.ParseLangArgs(langOrArgs...)
-	if msg, ok := yearcardLocales[lang]; ok {
+	if msg, ok := insufficientinventoryLocales[lang]; ok {
 		if len(args) > 0 {
 			return fmt.Sprintf(msg, args...)
 		}
 		return msg
 	}
-	return yearcardLocales["zh-HK"]
+	return insufficientinventoryLocales["zh-HK"]
 }
 
-func (YearCard) Code() int32 {
+func (InsufficientInventory) Code() int32 {
 	return 400
 }
 ```
