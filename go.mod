@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/dave/jennifer v1.6.1
+	github.com/davecgh/go-spew v1.1.1
 	github.com/samber/lo v1.38.1
 	github.com/spf13/cast v1.5.0
 	golang.org/x/tools v0.8.0

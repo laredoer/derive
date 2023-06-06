@@ -31,31 +31,36 @@ func ParseCommentToDerive(comment string) []DeriveType {
 		}
 
 		for _, call := range shap.Elements {
-			switch call.(type) {
+			switch callType := call.(type) {
 			case *ast.CallExpression:
 				derive := DeriveType{
-					Name: call.(*ast.CallExpression).Function.(*ast.Identifier).Value,
+					Name: callType.Function.(*ast.Identifier).Value,
 				}
-				arguments := call.(*ast.CallExpression).Arguments
+				arguments := callType.Arguments
 				for _, arg := range arguments {
-					deriveParam := Field{
-						Name: arg.(*ast.AssignLiteral).Name.(*ast.Identifier).Value,
+					deriveParam := Field{}
+					switch argType := arg.(type) {
+					case *ast.AssignLiteral:
+						deriveParam.Name = argType.Name.(*ast.Identifier).Value
+						switch argType.Expression.(type) {
+						case *ast.StringLiteral:
+							deriveParam.Value = argType.Expression.(*ast.StringLiteral).Value
+							deriveParam.Type = "string"
+						case *ast.IntegerLiteral:
+							deriveParam.Value = argType.Expression.(*ast.IntegerLiteral).Value
+							deriveParam.Type = "int"
+						}
+					case *ast.Identifier:
+						deriveParam.Name = argType.Value
 					}
-					switch arg.(*ast.AssignLiteral).Expression.(type) {
-					case *ast.StringLiteral:
-						deriveParam.Value = arg.(*ast.AssignLiteral).Expression.(*ast.StringLiteral).Value
-						deriveParam.Type = "string"
-					case *ast.IntegerLiteral:
-						deriveParam.Value = arg.(*ast.AssignLiteral).Expression.(*ast.IntegerLiteral).Value
-						deriveParam.Type = "int"
-					}
+
 					derive.Args = append(derive.Args, deriveParam)
 				}
 
 				derives = append(derives, derive)
 			case *ast.Identifier:
 				derives = append(derives, DeriveType{
-					Name: call.(*ast.Identifier).Value,
+					Name: callType.Value,
 					Args: []Field{},
 				})
 			}

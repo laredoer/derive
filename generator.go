@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	"log"
+
 	"github.com/dave/jennifer/jen"
 	"github.com/samber/lo"
 	"github.com/wule61/derive/i18n"
@@ -67,11 +69,14 @@ func (f *File) GenDecl(node ast.Node) bool {
 			}
 
 			typeName = typeSpec.Name.Name
-			tIdent, ok := typeSpec.Type.(*ast.Ident)
-			if !ok {
+			switch typeSpec.Type.(type) {
+			case *ast.StructType: // type xxx struct
+
+			case *ast.Ident: // type xxx int
+				basicType = typeSpec.Type.(*ast.Ident).Name
+			default:
 				continue
 			}
-			basicType = tIdent.Name
 		}
 
 		f.AddDerive(typeName, basicType, ParseCommentToDerive(comments))
@@ -161,6 +166,8 @@ func (g *Generator) Generate(file *File) {
 				if err != nil {
 					panic(err)
 				}
+			} else {
+				log.Printf("derive %#v not support\n", derive)
 			}
 		}
 	}
